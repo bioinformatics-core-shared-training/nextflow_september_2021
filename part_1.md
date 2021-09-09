@@ -172,7 +172,7 @@ follows:
 ```
 ./scripts/find_junction_spanning_sequences.R \
   --fastq=softclipped.fq.gz \
-  --flanking-sequences=flanking_sequences.csv \
+  --flanking-sequences=resources/flanking_sequences.csv \
   --output=matches.tsv
 ```
 
@@ -534,7 +534,7 @@ The new flanking_sequences parameter must be added to the configuration file.
 
 params {
     bam_files = "bam/ERR194147.*.bam"
-    flanking_sequences = "flanking_sequences.csv"
+    flanking_sequences = "resources/flanking_sequences.csv"
 }
 ```
 
@@ -607,9 +607,9 @@ N E X T F L O W  ~  version 20.10.0
 Launching `junction_detection_pipeline/junction_detection.nf` [modest_fourier] - revision: ee26729252
 executor >  local (3)
 [82/ff7d7f] process > extract_soft_clipped_reads (3) [100%] 3 of 3 ✔
-[/Users/eldrid01/training/nextflow/junction_detection/work/49/2570d490fbf777b2c25ac6c5f6217b/ERR194147.2.fq.gz, /Users/eldrid01/training/nextflow/junction_detection/flanking_sequences.csv]
-[/Users/eldrid01/training/nextflow/junction_detection/work/09/917fbcf565cdfdd9297b162379442d/ERR194147.3.fq.gz, /Users/eldrid01/training/nextflow/junction_detection/flanking_sequences.csv]
-[/Users/eldrid01/training/nextflow/junction_detection/work/82/ff7d7f8b74786c288cd57b4db368fc/ERR194147.1.fq.gz, /Users/eldrid01/training/nextflow/junction_detection/flanking_sequences.csv]
+[/Users/eldrid01/training/nextflow/junction_detection/work/49/2570d490fbf777b2c25ac6c5f6217b/ERR194147.2.fq.gz, /Users/eldrid01/training/nextflow/junction_detection/resources/flanking_sequences.csv]
+[/Users/eldrid01/training/nextflow/junction_detection/work/09/917fbcf565cdfdd9297b162379442d/ERR194147.3.fq.gz, /Users/eldrid01/training/nextflow/junction_detection/resources/flanking_sequences.csv]
+[/Users/eldrid01/training/nextflow/junction_detection/work/82/ff7d7f8b74786c288cd57b4db368fc/ERR194147.1.fq.gz, /Users/eldrid01/training/nextflow/junction_detection/resources/flanking_sequences.csv]
 ```
 
 The `combine` operation results in a channel in which 2-element lists are
@@ -745,7 +745,7 @@ process find_junction_spanning_reads {
 
 params {
     bam_files          = "bam/ERR194147.*.bam"
-    flanking_sequences = "flanking_sequences.csv"
+    flanking_sequences = "resources/flanking_sequences.csv"
     output_dir         = "outputs"
 }
 ```
@@ -783,7 +783,7 @@ workflow {
 
 params {
     bam_files          = "bam/ERR194147.*.bam"
-    flanking_sequences = "flanking_sequences.csv"
+    flanking_sequences = "resources/flanking_sequences.csv"
     results            = "flanking_sequence_matches.tsv"
 }
 ```
@@ -837,7 +837,7 @@ process find_junction_spanning_reads {
 
 params {
     bam_files          = "bam/ERR194147.*.bam"
-    flanking_sequences = "flanking_sequences.csv"
+    flanking_sequences = "resources/flanking_sequences.csv"
     output_dir         = "outputs"
     results            = "flanking_sequence_matches.tsv"
     max_distance       = 2
@@ -918,7 +918,7 @@ workflow {
 
 params {
     bam_files          = "bam/ERR194147.*.bam"
-    flanking_sequences = "flanking_sequences.csv"
+    flanking_sequences = "resources/flanking_sequences.csv"
     results            = "flanking_sequence_matches.tsv"
     max_distance       = 2
     chunk_size         = 10000
