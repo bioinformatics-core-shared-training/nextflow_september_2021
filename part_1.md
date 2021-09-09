@@ -139,12 +139,15 @@ Download and unpack tarball.
 ```
 wget https://content.cruk.cam.ac.uk/bioinformatics/CourseData/NextflowSeptember2021/junction_detection.tar
 tar xf junction_detection.tar
-cd junction_detection
 ```
 
 The extracted junction_detection directory contains `bam`, `resources` and
 `scripts` subdirectories and provides a convenient working directory for the
 rest of this walk-through.
+
+```
+cd junction_detection
+```
 
 ### Step 1: Extract soft-clipped reads
 
