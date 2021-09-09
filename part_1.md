@@ -716,7 +716,7 @@ intermediate files but are needed as final output files.
 
 process find_junction_spanning_reads {
 
-    publishDir "${params.output_dir}", mode: "copy"
+    publishDir "${params.results_dir}", mode: "copy"
 
     input:
         tuple path(fastq), path(flanking_sequences)
@@ -746,7 +746,7 @@ process find_junction_spanning_reads {
 params {
     bam_files          = "bam/ERR194147.*.bam"
     flanking_sequences = "resources/flanking_sequences.csv"
-    output_dir         = "outputs"
+    results_dir        = "results"
 }
 ```
 
@@ -755,8 +755,8 @@ params {
 The `collectFile` operator is very useful for collecting the outputs from a
 channel and saving them to a single file.
 
-We'll remove the `publishDir` directive introduced in the previous section
-along with the `output_dir` parameter and replace these with a single,
+We'll remove the `publishDir` directive introduced in the previous section,
+along with the `results_dir` parameter, and replace these with a single
 concatenated results file.
 
 ```
@@ -784,7 +784,7 @@ workflow {
 params {
     bam_files          = "bam/ERR194147.*.bam"
     flanking_sequences = "resources/flanking_sequences.csv"
-    results            = "flanking_sequence_matches.tsv"
+    results            = "results/flanking_sequence_matches.tsv"
 }
 ```
 
@@ -807,8 +807,6 @@ in matching flanking sequences, to show this in action.
 // ...
 
 process find_junction_spanning_reads {
-
-    publishDir "${params.output_dir}", mode: "copy"
 
     input:
         tuple path(fastq), path(flanking_sequences)
@@ -838,8 +836,7 @@ process find_junction_spanning_reads {
 params {
     bam_files          = "bam/ERR194147.*.bam"
     flanking_sequences = "resources/flanking_sequences.csv"
-    output_dir         = "outputs"
-    results            = "flanking_sequence_matches.tsv"
+    results            = "results/flanking_sequence_matches.tsv"
     max_distance       = 2
 }
 ```
@@ -919,7 +916,7 @@ workflow {
 params {
     bam_files          = "bam/ERR194147.*.bam"
     flanking_sequences = "resources/flanking_sequences.csv"
-    results            = "flanking_sequence_matches.tsv"
+    results            = "results/flanking_sequence_matches.tsv"
     max_distance       = 2
     chunk_size         = 10000
 }
