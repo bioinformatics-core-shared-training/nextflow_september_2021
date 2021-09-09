@@ -131,9 +131,20 @@ pattern matching.
 ### Junction detection script and test data
 
 The R script for detecting junction-spanning reads and some test sequence data
-files are available here:
+files are available
+[here](https://content.cruk.cam.ac.uk/bioinformatics/CourseData/NextflowSeptember2021/junction_detection.tar)
 
-TODO
+Download and unpack tarball.
+
+```
+wget https://content.cruk.cam.ac.uk/bioinformatics/CourseData/NextflowSeptember2021/junction_detection.tar
+tar xf junction_detection.tar
+cd junction_detection
+```
+
+The extracted junction_detection directory contains `bam`, `resources` and
+`scripts` subdirectories and provides a convenient working directory for the
+rest of this walk-through.
 
 ### Step 1: Extract soft-clipped reads
 
@@ -774,7 +785,7 @@ workflow {
       | extract_soft_clipped_reads \
       | combine(flanking_sequences) \
       | find_junction_spanning_reads \
-      | collectFile(name: params.results, keepHeader: true, storeDir: "${launchDir}")
+      | collectFile(name: params.results, keepHeader: true")
 }
 ```
 
@@ -906,7 +917,7 @@ workflow {
       | splitFastq(by: params.chunk_size, file: true, compress: true) \
       | combine(flanking_sequences) \
       | find_junction_spanning_reads \
-      | collectFile(name: params.results, keepHeader: true, storeDir: "${launchDir}")
+      | collectFile(name: params.results, keepHeader: true)
 }
 ```
 
