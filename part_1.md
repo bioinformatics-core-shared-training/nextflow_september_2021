@@ -1,8 +1,6 @@
 # Nextflow training session
 
-Internal training session for the analysis team within the CRUK-CI Bioinformatics Core.
-
-13 September 2021
+# Part 1 - walk-through of a simple pipeline
 
 ## Introduction
 
