@@ -29,7 +29,7 @@ talk about this in the training, but for now you need to make a couple of tweaks
 
 There is a parameter that sets the location of java. Its default is the path
 on Linux, so if you're on a Mac you'll need to change this to its location on
-computer (`which java` will give the path).
+your computer (`which java` will give the path).
 
 BWA and Picard are supplied in the pipeline zip file. Picard is Java so is
 platform agnostic, but BWA is compiled code. There are two directories `bin_linux`
@@ -66,11 +66,12 @@ Run this from the data directory (wherever you have expanded the data zip).
 ### Step 1: Alignment
 
 1. Create a channel that will pick up all the FASTQ files in
-`params.fastqDir` in the work flow.
+"`params.fastqDir`" in the work flow.
     1. Use the function "`extractBaseName`" in the file to extract
-    a "base name" from the file name.
-    2. The output from this channel should be the base name (the 
-    name without `.fq.gz` on the end) and the FASTQ file.
+    a "base name" from the file name. This is the file name without
+    `.fq.gz` on the end.
+    2. The output from this channel should be the base name and the
+    FASTQ file.
 2. Create a process to run _BWAmem_.
     1. Input needs to be a tuple of the base name and the FASTQ file.
     Output needs to be a tuple of the base name and the SAM file.
