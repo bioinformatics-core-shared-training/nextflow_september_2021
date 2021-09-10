@@ -884,9 +884,22 @@ Use the `-with-report` and `-with-timeline` options to generate these reports.
 nextflow run \
   -c junction_detection.config \
   junction_detection_pipeline/junction_detection.nf \
-  -with-report report.html \
-  -with-timeline timeline.html
+  -with-report reports/report.html \
+  -with-timeline reports/timeline.html
 ```
+
+*Note*
+
+Nextflow is unable to obtain runtime metrics on Mac OS unless the processes are
+run using a Docker or Singularity container (beyond the scope of this session).
+This means that the execution report will not contain some of the more useful
+information about resource usage.
+
+*Exercise*
+
+* Take a look at the HTML reports and what details these provide
+* Create an error in the R script that results in a failure, re-run the pipeline and see how this is reported both in the log file and the execution report
+* If you're using a Mac, try re-running the pipeline on a Linux server to see the more complete execution report
 
 ## Built-in splitting and parallelization
 
