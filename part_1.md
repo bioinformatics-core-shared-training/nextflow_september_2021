@@ -1265,7 +1265,7 @@ gathered for each sample very straightforwardly.
 >
 > * Repeat with two BAM files mapped to one sample and the third coming from a different sample
 
-## Managing resources and profiles
+## Managing resources
 
 The `.nextflow.log` log file produced by Nextflow contains some information
 about the way it is managing resources when determining what jobs to run and
@@ -1399,6 +1399,60 @@ setting the `memory` parameter for the local executor.
 > * Re-run the pipeline with the updated CPU and memory settings and look at the timeline report
 >
 > * Has Nextflow limited the number of jobs run in parallel in the way you expect?
+
+## Profiles
+
+We may want to have different resource settings for different computers on which
+we will run our pipeline. This can be managed using profiles.
+
+We'll create two profiles: a standard profile that we'll use when developing the
+workflow on a desktop or laptop computer and another profile named 'bigserver'
+that we'll use for deploying the workflow on a much larger server computer.
+
+```
+// junction_detection.config
+
+// ...
+
+process {
+    cpus = 1
+    memory = "1 GB"
+}
+
+profiles {
+    standard {
+        process.executor = "local"
+        executor {
+            cpus = 4
+            memory = "6 GB"
+        }
+    }
+
+    bigserver {
+        process.executor = "local"
+        executor {
+            cpus = 30
+            memory = "128 GB"
+        }
+    }
+}
+```
+
+The configuration file features a `profiles` block in place of the `executor`
+block we had previously. Each of the two profiles defined, `standard` and
+`bigserver` have their own `executor` block and specify that the local executor
+is to be used.
+
+The `standard` profile is run by default but the pipeline can be launched with a
+different profile by using the `-profile` command-line option.
+
+```
+nextflow run \
+  -c junction_detection.config \
+  junction_detection_pipeline/junction_detection.nf \
+  -profile bigserver \
+  -with-timeline reports/timeline.html
+```
 
 ## Running on a cluster
 
