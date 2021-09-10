@@ -164,7 +164,9 @@ Here is the command for the first step:
 ```
 samtools view -h -F2048 bam/ERR194147.1.bam \
   | awk '$0 ~ /^@/ || $6 ~ /S/' \
-  | samtools fastq -N -o softclipped.fq.gz
+  | samtools fastq -N - \
+  | gzip \
+  > softclipped.fq.gz
 ```
 
 `samtools` is used to read the BAM file and pass records to `awk` in tabular SAM
@@ -317,7 +319,9 @@ process extract_soft_clipped_reads {
         """
         samtools view -h -F2048 ${bam} \
           | awk '$0 ~ /^@/ || $6 ~ /S/' \
-          | samtools fastq -N -o softclipped.fq.gz
+          | samtools fastq -N - \
+          | gzip \
+          > softclipped.fq.gz
         """
 }
 
@@ -405,7 +409,9 @@ process extract_soft_clipped_reads {
         """
         samtools view -h -F2048 ${bam} \
           | awk '\$0 ~ /^@/ || \$6 ~ /S/' \
-          | samtools fastq -N -o ${fastq}
+          | samtools fastq -N - \
+          | gzip \
+          > ${fastq}
         """
 }
 
@@ -508,7 +514,9 @@ process extract_soft_clipped_reads {
         """
         samtools view -h -F2048 ${bam} \
           | awk '\$0 ~ /^@/ || \$6 ~ /S/' \
-          | samtools fastq -N -o ${fastq}
+          | samtools fastq -N - \
+          | gzip \
+          > ${fastq}
         """
 }
 
@@ -660,7 +668,9 @@ process extract_soft_clipped_reads {
         """
         samtools view -h -F2048 ${bam} \
           | awk '\$0 ~ /^@/ || \$6 ~ /S/' \
-          | samtools fastq -N -o ${fastq}
+          | samtools fastq -N - \
+          | gzip \
+          > ${fastq}
         """
 }
 
@@ -1192,7 +1202,9 @@ process extract_soft_clipped_reads {
         """
         samtools view -h -F2048 ${bam} \
           | awk '\$0 ~ /^@/ || \$6 ~ /S/' \
-          | samtools fastq -N -o ${fastq}
+          | samtools fastq -N - \
+          | gzip \
+          > ${fastq}
         """
 }
 
