@@ -52,10 +52,9 @@ do this, change the "`referenceFasta`" and "`bwaIndex`" parameters in
 For the first part of the exercise, we’ll run FASTQ as they are through the
 align, sort, mark duplicates and calculate metrics steps.
 
-Before you start, make a copy of the `start.nf` file as `simple.nf`.
-The command to launch the pipeline is:
-
-To run Nextflow with your pipeline at each step, the command is:
+Before you start, make a copy of the `start.nf` file as `simple.nf`. You'll
+be editing `simple.nf`. To run Nextflow with your pipeline at each step, the
+command is:
 
 ```
 nextflow run <path to pipeline>/simple.nf
@@ -166,7 +165,8 @@ this feature to the pipeline you've written in the previous part as an example
 of splitting and merging.
 
 Before making changes, make a copy of your `single.nf` file as `chunked.nf`.
-The command to launch the pipeline then becomes:
+Make the changes to your pipeline in `chunked.nf`. The command to launch the
+pipeline thus becomes:
 
 ```BASH
 nextflow run <path to pipeline>/chunked.nf
@@ -176,7 +176,7 @@ nextflow run <path to pipeline>/chunked.nf
 
 1. Change the initial FASTQ channel that finds the files to split the FASTQ
 file into chunks of 10,000 reads.
-    1. Hint: look at the Nextflow documentation under "Splitting Operators".
+    1. _Hint: look at the Nextflow documentation under "Splitting Operators"._
     2. Your channel should now be tuples of three elements: the file's base
     name, the chunk number, and the FASTQ file (one chunk).
 
@@ -192,8 +192,8 @@ input tuple and pass it on in its output tuple.
 ### Step 3: Change the channel to remove chunk numbers
 
 1. Change the output channel from _SortSam_ to remove the chunk number.
-2. Group this channel by base name (see "Combining Operators" in the
-documentation).
+2. Group this channel by base name.
+    1. _Hint: see "Combining Operators" in the documentation._
 
 ### Step 4: Adapt MarkDuplicates to work accept all chunks for a file
 
