@@ -1454,6 +1454,77 @@ nextflow run \
   -with-timeline reports/timeline.html
 ```
 
+## Default configuration settings
+
+Nextflow obtains its configuration from a number of files in multiple locations
+as well as allowing for parameters to be set as command-line arguments as we saw
+earlier.
+
+There is an order of precedence of the various locations so settings found in
+one file may be overridden by the same parameters set in a different file. The
+Nextflow documentation explains this clearly.
+
+The default process resource settings and the profiles we created in the
+previous two sections are better placed in a pipeline configuration file within
+the workflow installation directory rather than the configuration file we've
+been using that resides in a run folder.
+
+We can create a configuration file named `nextflow.config` in the pipeline
+installation directory, i.e. the same directory that is home to our workflow
+file (`junction_detection.nf`). This could even contain default settings for
+our parameters.
+
+```
+// nextflow.config
+
+params {
+    sample_sheet       = "sample_sheet.csv"
+    flanking_sequences = "flanking_sequences.csv"
+    results_dir        = "results"
+    max_distance       = 2
+    chunk_size         = 1000000
+}
+
+process {
+    cpus = 1
+    memory = "1 GB"
+}
+
+profiles {
+    standard {
+        process.executor = "local"
+        executor {
+            cpus = 4
+            memory = "6 GB"
+        }
+    }
+
+    bigserver {
+        process.executor = "local"
+        executor {
+            cpus = 30
+            memory = "128 GB"
+        }
+    }
+}
+```
+
+Our run directory configuration file is simplified as it will no longer need
+most of the configuration settings but will override some of the settings
+specific to our particular run.
+
+```
+// junction_detection.config
+
+params {
+    sample_sheet       = "sample_sheet.csv"
+    flanking_sequences = "resources/flanking_sequences.csv"
+    results_dir        = "results"
+    max_distance       = 1
+    chunk_size         = 10000
+}
+```
+
 ## Running on a cluster
 
 TODO
