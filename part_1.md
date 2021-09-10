@@ -52,7 +52,7 @@ java -version
 Next download and install Nextflow.
 
 ```
-curl -s https://get.nextflow.io | bash 
+curl -s https://get.nextflow.io | bash
 ```
 
 If you don't have `curl` installed download the installation script from the URL
@@ -270,9 +270,9 @@ bam_channel = Channel.fromPath("bam/ERR194147.1.bam", checkIfExists: true)
 bam_channel.view()
 ```
 
-*Exercise*
-
-* Change the BAM file path to a non-existent file and re-run the script.
+> #### *Exercise*
+>
+> * Change the BAM file path to a non-existent file and re-run the script.
 
 ## Separate workflow installation directory
 
@@ -282,7 +282,7 @@ It is good practice to develop and maintain the workflow within its own separate
 installation directory some place else on the file system, e.g. an area where
 other tools and pipelines under development are installed.
 
-For this exercise we'll create a subdirectory under our current directory.
+For this session we'll create a subdirectory under our current directory.
 
 ```
 mkdir junction_detection_pipeline
@@ -338,34 +338,35 @@ double-quote characters. Using double quotes allows for variable substitution,
 in much the same way as is common in bash scripts. Note the BAM input file path
 is substituted using `${bam}`.
 
-*Exercises*
-
-* Run the above version of our workflow and look at the error that's reported
-
-* Can you work out why it fails and how to fix this?
-> * *Hint: you will need to escape the dollar symbols that are not being used for Nextflow variables (use backslash)*
-
-* Check the work directory after it has been run successfully
-
-* Look at the directories and files that have been created and try to understand how Nextflow sets up and runs the process
-> * *Hint: look for hidden files*
-
-* Examine the hidden log file named `.nextflow.log`
-* What can you tell about how Nextflow is managing resources on your computer?
-
-* Re-run the workflow and see what's changed - have any new files been created?
-
-* Clean out the work directories, log files and cache
-
-```
-rm -rf work .nextflow*
-```
-
-* Change the file path for the BAM channel to run over all BAM files in the `bam` directory
-
-* What do expect will happen when re-running the workflow?
-
-* Re-run and check if you're correct
+> #### *Exercise*
+>
+> * Run the above version of our workflow and look at the error that's reported
+>
+> * Can you work out why it fails and how to fix this?
+> > * *Hint: you will need to escape the dollar symbols that are not being used for Nextflow variables (use backslash)*
+>
+> * Check the work directory after it has been run successfully
+>
+> * Look at the directories and files that have been created and try to understand how Nextflow sets up and runs the process
+> > * *Hint: look for hidden files*
+>
+> * Examine the hidden log file named `.nextflow.log`
+>
+> * What can you tell about how Nextflow is managing resources on your computer?
+>
+> * Re-run the workflow and see what's changed - have any new files been created?
+>
+> * Clean out the work directories, log files and cache
+>
+> ```
+> rm -rf work .nextflow*
+> ```
+>
+> * Change the file path for the BAM channel to run over all BAM files in the `bam` directory
+>
+> * What do expect will happen when re-running the workflow?
+>
+> * Re-run and check if you're correct
 
 ## Obtaining unique IDs from file names
 
@@ -568,11 +569,11 @@ mkdir junction_detection_pipeline/bin
 cp scripts/find_junction_spanning_sequences.R junction_detection_pipeline/bin
 ```
 
-*Exercise*
-
-* Run the updated pipeline and check what processes are run and what outputs are produced
-
-* The fastq and flanking_sequences channels are not combined correctly - can you spot the problem?
+> #### *Exercise*
+>
+> * Run the updated pipeline and check what processes are run and what outputs are produced
+>
+> * The fastq and flanking_sequences channels are not combined correctly - can you spot the problem?
 
 ## Combining outputs from two channels
 
@@ -874,9 +875,9 @@ executor >  local (3)
 [70/9b08ad] process > find_junction_spanning_reads (3) [100%] 3 of 3 ✔
 ```
 
-*Exercise*
-
-* Explore the hidden `.nextflow` directory and the history file and cache directories contained within this
+> #### *Exercise*
+>
+> * Explore the hidden `.nextflow` directory and the history file and cache directories contained within this
 
 ## Pipeline reports
 
@@ -900,13 +901,13 @@ run using a Docker or Singularity container (beyond the scope of this session).
 This means that the execution report will not contain some of the more useful
 information about resource usage.
 
-*Exercise*
-
-* Take a look at the HTML reports and what details these provide
-
-* Create an error in the R script that results in a failure, re-run the pipeline and see how this is reported both in the log file and the execution report
-
-* If you're using a Mac, try re-running the pipeline on a Linux server to see the more complete execution report
+> #### *Exercise*
+>
+> * Take a look at the HTML reports and what details these provide
+>
+> * Create an error in the R script that results in a failure, re-run the pipeline and see how this is reported both in the log file and the execution report
+>
+> * If you're using a Mac, try re-running the pipeline on a Linux server to see the more complete execution report
 
 ## Built-in splitting and parallelization
 
@@ -972,9 +973,9 @@ executor >  local (13)
 [c9/72a5a8] process > find_junction_spanning_reads (10) [100%] 10 of 10 ✔
 ```
 
-*Exercise*
-
-* Compare the timeline reports before and after this chunking optimization
+> #### *Exercise*
+>
+> * Compare the timeline reports before and after this chunking optimization
 
 ## Using a sample sheet
 
