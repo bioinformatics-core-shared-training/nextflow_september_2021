@@ -888,7 +888,7 @@ nextflow run \
   -with-timeline timeline.html
 ```
 
-## Built-in splitting and parallelization
+## Built-in splitting and parallelization
 
 Nextflow has some built-in splitting operations that can be used to split items
 or output files from a channel into chunks for parallelization of downstream
