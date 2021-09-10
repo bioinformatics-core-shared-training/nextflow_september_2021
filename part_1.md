@@ -254,9 +254,9 @@ Launching `junction_detection.nf` [angry_khorana] - revision: 58a8f77e6a
 Note that a `work` directory was created but that it is empty since no actual
 work was done. For that we need to create a process.
 
-#### *Exercise*
-
-* Change the file pattern to use a wildcard, i.e. `bam/ERR194147.*.bam` and re-run.
+> #### *Exercise*
+>
+> * Change the file pattern to use a wildcard, i.e. `bam/ERR194147.*.bam` and re-run.
 
 Revert back to a single BAM file and add an additional argument to the
 `Channel.fromPath()` function to check if the file exists.
