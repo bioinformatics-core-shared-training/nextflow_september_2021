@@ -254,7 +254,7 @@ Launching `junction_detection.nf` [angry_khorana] - revision: 58a8f77e6a
 Note that a `work` directory was created but that it is empty since no actual
 work was done. For that we need to create a process.
 
-> #### *Exercise*
+> _**Exercise**_
 >
 > * Change the file pattern to use a wildcard, i.e. `bam/ERR194147.*.bam` and re-run.
 
@@ -270,7 +270,7 @@ bam_channel = Channel.fromPath("bam/ERR194147.1.bam", checkIfExists: true)
 bam_channel.view()
 ```
 
-> #### *Exercise*
+> _**Exercise**_
 >
 > * Change the BAM file path to a non-existent file and re-run the script.
 
@@ -338,7 +338,7 @@ double-quote characters. Using double quotes allows for variable substitution,
 in much the same way as is common in bash scripts. Note the BAM input file path
 is substituted using `${bam}`.
 
-> #### *Exercise*
+> _**Exercise**_
 >
 > * Run the above version of our workflow and look at the error that's reported
 >
@@ -569,7 +569,7 @@ mkdir junction_detection_pipeline/bin
 cp scripts/find_junction_spanning_sequences.R junction_detection_pipeline/bin
 ```
 
-> #### *Exercise*
+> _**Exercise**_
 >
 > * Run the updated pipeline and check what processes are run and what outputs are produced
 >
@@ -875,7 +875,7 @@ executor >  local (3)
 [70/9b08ad] process > find_junction_spanning_reads (3) [100%] 3 of 3 ✔
 ```
 
-> #### *Exercise*
+> _**Exercise**_
 >
 > * Explore the hidden `.nextflow` directory and the history file and cache directories contained within this
 
@@ -901,7 +901,7 @@ run using a Docker or Singularity container (beyond the scope of this session).
 This means that the execution report will not contain some of the more useful
 information about resource usage.
 
-> #### *Exercise*
+> _**Exercise**_
 >
 > * Take a look at the HTML reports and what details these provide
 >
@@ -973,7 +973,7 @@ executor >  local (13)
 [c9/72a5a8] process > find_junction_spanning_reads (10) [100%] 10 of 10 ✔
 ```
 
-> #### *Exercise*
+> _**Exercise**_
 >
 > * Compare the timeline reports before and after this chunking optimization
 
