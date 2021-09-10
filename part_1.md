@@ -132,7 +132,7 @@ pattern matching.
 
 The R script for detecting junction-spanning reads and some test sequence data
 files are available
-[here](https://content.cruk.cam.ac.uk/bioinformatics/CourseData/NextflowSeptember2021/junction_detection.tar)
+[here](https://content.cruk.cam.ac.uk/bioinformatics/CourseData/NextflowSeptember2021/junction_detection.tar).
 
 Download and unpack tarball.
 
@@ -254,7 +254,7 @@ Launching `junction_detection.nf` [angry_khorana] - revision: 58a8f77e6a
 Note that a `work` directory was created but that it is empty since no actual
 work was done. For that we need to create a process.
 
-*Exercise*
+#### *Exercise*
 
 * Change the file pattern to use a wildcard, i.e. `bam/ERR194147.*.bam` and re-run.
 
@@ -341,12 +341,14 @@ is substituted using `${bam}`.
 *Exercises*
 
 * Run the above version of our workflow and look at the error that's reported
+
 * Can you work out why it fails and how to fix this?
-> * *Hint: you will need to escape dollar symbols that should not be substituted with backslash*
+> * *Hint: you will need to escape the dollar symbols that are not being used for Nextflow variables (use backslash)*
 
 * Check the work directory after it has been run successfully
+
 * Look at the directories and files that have been created and try to understand how Nextflow sets up and runs the process
-> *Hint: look for hidden files*
+> * *Hint: look for hidden files*
 
 * Examine the hidden log file named `.nextflow.log`
 * What can you tell about how Nextflow is managing resources on your computer?
@@ -360,8 +362,10 @@ rm -rf work .nextflow*
 ```
 
 * Change the file path for the BAM channel to run over all BAM files in the `bam` directory
+
 * What do expect will happen when re-running the workflow?
-* Re-run and check if you're correct.
+
+* Re-run and check if you're correct
 
 ## Obtaining unique IDs from file names
 
@@ -567,6 +571,7 @@ cp scripts/find_junction_spanning_sequences.R junction_detection_pipeline/bin
 *Exercise*
 
 * Run the updated pipeline and check what processes are run and what outputs are produced
+
 * The fastq and flanking_sequences channels are not combined correctly - can you spot the problem?
 
 ## Combining outputs from two channels
@@ -898,7 +903,9 @@ information about resource usage.
 *Exercise*
 
 * Take a look at the HTML reports and what details these provide
+
 * Create an error in the R script that results in a failure, re-run the pipeline and see how this is reported both in the log file and the execution report
+
 * If you're using a Mac, try re-running the pipeline on a Linux server to see the more complete execution report
 
 ## Built-in splitting and parallelization
