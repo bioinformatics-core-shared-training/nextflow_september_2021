@@ -1267,7 +1267,138 @@ gathered for each sample very straightforwardly.
 
 ## Managing resources and profiles
 
-TODO
+The `.nextflow.log` log file produced by Nextflow contains some information
+about the way it is managing resources when determining what jobs to run and
+when to run them.
+
+The following lines are an excerpt from the log file created on running the
+workflow on a MacBook laptop.
+
+```
+Sep-10 16:47:29.151 [main] DEBUG nextflow.Session - Executor pool size: 8
+Sep-10 16:47:29.190 [main] DEBUG nextflow.cli.CmdRun -
+  Version: 20.10.0 build 5430
+  Created: 01-11-2020 15:14 UTC (15:14 BST)
+  System: Mac OS X 10.16
+  Runtime: Groovy 3.0.5 on OpenJDK 64-Bit Server VM 11.0.10+9
+  Encoding: UTF-8 (UTF-8)
+  Process: 25082@C02DKBL4P3XY [10.20.80.185]
+  CPUs: 8 - Mem: 8 GB (950 MB) - Swap: 1 GB (492.8 MB)
+```
+
+Nextflow has determined that the computer has 8 CPUs and a total of 8 GB of
+memory.
+
+The timeline report for this run shows that it only ran 8 of the
+`find_junction_spanning_reads` processes at any one time with 2 of the 10 jobs
+waiting until others had completed.
+
+![Timeline report](images/timeline.png)
+
+Nextflow has assumed that each process requires a single CPU and has limited
+the number of concurrent jobs accordingly.
+
+We can limit the number of CPUs that Nextflow uses by setting the `cpus`
+parameter in the `junction_detection.config` configuration file as follows.
+
+```
+// junction_detection.config
+
+params {
+    sample_sheet       = "sample_sheet.csv"
+    flanking_sequences = "resources/flanking_sequences.csv"
+    results_dir        = "results"
+    max_distance       = 1
+    chunk_size         = 10000
+}
+
+executor {
+    name = "local"
+    cpus = 4
+}
+```
+
+We added a new block for the 'local' executor. In the Nextflow framework
+architecture, the executor is the component that determines the system where a
+pipeline process is run and supervises its execution. The local executor is used
+by default and runs processes on the computer where Nextflow is launched.
+
+> _**Exercise**_
+>
+> * Re-run the pipeline with the additional *executor* configuration given above and look at the timeline report
+>
+> * What change do you see in the way in the way in which Nextflow has run the jobs?
+
+The other aspect of a job we may want to exercise some control over is its
+memory requirement. Let's say we expect the `find_junction_spanning_reads`
+process to require 2 GB we can specify that using a `memory` directive in the
+process definition within the workflow.
+
+```
+// junction_detection.nf
+
+// ...
+
+process find_junction_spanning_reads {
+
+    memory "2 GB"
+
+    input:
+        tuple val(id), path(fastq), path(flanking_sequences)
+
+    output:
+        path matches
+
+    script:
+        matches = "${id}.tsv"
+        """
+        find_junction_spanning_sequences.R \
+          --id=${id} \
+          --fastq=${fastq} \
+          --flanking-sequences=${flanking_sequences} \
+          --output=${matches} \
+          --max-distance=${params.max_distance}
+        """
+}
+
+// ...
+```
+
+Similarly we would specify the number of CPUs the process would require if this
+was more than one.
+
+We can provide default CPU and memory settings for all processes in our workflow
+by adding a process block in our configuration file.
+
+```
+// junction_detection.config
+
+// ...
+
+process {
+    cpus = 1
+    memory = "1 GB"
+}
+
+executor {
+    name = "local"
+    cpus = 4
+    memory = "6 GB"
+}
+```
+
+In this case all processes are allocated a single CPU and 1 GB of memory by
+default unless these settings are overridden as we did for the
+`find_junction_spanning_reads` process, which was allocated 2 GB.
+
+We have also limited the total amount of memory that the workflow can use by
+setting the `memory` parameter for the local executor.
+
+> _**Exercise**_
+>
+> * Re-run the pipeline with the updated CPU and memory settings and look at the timeline report
+>
+> * Has Nextflow limited the number of jobs run in parallel in the way you expect?
 
 ## Running on a cluster
 
