@@ -956,6 +956,7 @@ params {
     chunk_size         = 10000
 }
 ```
+
 Re-running the pipeline shows that we've split the three
 `find_junction_spanning_reads` processes into 10 jobs.
 
@@ -977,9 +978,292 @@ executor >  local (13)
 >
 > * Compare the timeline reports before and after this chunking optimization
 
+Having split our `find_junction_spanning_reads` task into chunks we might want
+combine the outputs for each of the datasets separately rather than
+concatenating all the outputs as our current `collectFile` operation does. If
+we don't specify a file when calling `collectFile`, outputs with the same name
+are grouped together.
+
+We'll reinstate the `results_dir` parameter and use this to set the `storeDir`
+argument to `collectFile`.
+
+```
+// junction_detection.nf
+
+// ...
+
+workflow {
+
+    bam = Channel.fromPath(params.bam_files, checkIfExists: true)
+
+    flanking_sequences = Channel.fromPath(params.flanking_sequences, checkIfExists: true)
+
+    bam \
+      | extract_soft_clipped_reads \
+      | splitFastq(by: params.chunk_size, file: true, compress: true) \
+      | combine(flanking_sequences) \
+      | find_junction_spanning_reads \
+      | collectFile(keepHeader: true, storeDir: params.results_dir)
+}
+```
+
+```
+// junction_detection.config
+
+params {
+    bam_files          = "bam/ERR194147.*.bam"
+    flanking_sequences = "resources/flanking_sequences.csv"
+    results_dir        = "results"
+    max_distance       = 2
+    chunk_size         = 10000
+}
+```
+
+> _**Exercise**_
+>
+> * Update the pipeline with the change to the `collectFile` operation, re-run and look at difference in the results files that are created
+
 ## Using a sample sheet
 
-TODO
+In its current form the workflow uses sample or dataset identifiers taken from
+the input BAM file names and assumes that all input BAM files are named in this
+way. This could become inconvenient if a new set of BAM files is supplied that
+are named in a completely different way, e.g. constructed from flow cell, pool
+and barcode IDs instead.
+
+Using a sample sheet that maps BAM files to sample names or identifiers is an
+alternative and arguably better solution and Nextflow has built-in functions for
+reading the rows from a CSV file into a channel.
+
+Instead of taking the prefix of the BAM file we'll use an ID from a CSV file
+that contains two columns: `id` and `bam`.
+
+Create a sample sheet CSV file named `sample_sheet.csv` with the following
+contents:
+
+```
+id,bam
+ERR194147_1,bam/ERR194147.1.bam
+ERR194147_2,bam/ERR194147.2.bam
+ERR194147_3,bam/ERR194147.3.bam
+```
+
+We're going to try to create a channel that contains tuples of 2 elements,
+pairing the ID and the BAM file path. We'll then modify our workflow, changing
+the inputs for each of the processes and removing the Groovy code for obtaining
+the ID from the input file name.
+
+Experimenting with channel operations is sometimes easier done in a separate
+test Nextflow script. We'll do this now and then when we're happy with the
+result we'll migrate it into our existing workflow.
+
+Create a new `test.nf` file in your working directory, i.e. the run directory,
+not the pipeline installation folder, and add the following line to create a
+channel for the sample sheet CSV file.
+
+```
+// test.nf
+sample_sheet = Channel.fromPath("sample_sheet.csv")
+sample_sheet.view()
+```
+
+We're not so concerned about hard-coded file names at this stage of prototyping
+and will parameterize this later when incorporating the new code into our main
+workflow.
+
+We're going to use Nextflow's `splitCsv` operator and look at the results using
+the `view` operator. Let's try it first with no arguments.
+
+```
+// test.nf
+sample_sheet = Channel.fromPath("sample_sheet.csv")
+
+sample_sheet.splitCsv().view()
+```
+
+Running this should give something like the following output:
+
+```
+nextflow run test.nf
+
+N E X T F L O W  ~  version 20.10.0
+Launching `test.nf` [hopeful_kimura] - revision: ef60f1a82f
+[id, bam]
+[ERR194147, bam/ERR194147.1.bam]
+[ERR194147, bam/ERR194147.2.bam]
+[ERR194147, bam/ERR194147.3.bam]
+```
+
+Each item in the channel produced by `splitCsv` is a list of 2 items. The header
+is included as the first such list, which we don't really want. A look at the
+Nextflow documentation shows that there are a number of parameters we can supply
+to `splitCsv` including the `header` parameter.
+
+```
+// test.nf
+sample_sheet = Channel.fromPath("sample_sheet.csv")
+
+sample_sheet
+    .splitCsv(header:true)
+    .view()
+```
+
+```
+nextflow run test.nf
+
+N E X T F L O W  ~  version 20.10.0
+Launching `test.nf` [fabulous_curran] - revision: fe2850f108
+[id:ERR194147_1, bam:bam/ERR194147.1.bam]
+[id:ERR194147_2, bam:bam/ERR194147.2.bam]
+[id:ERR194147_3, bam:bam/ERR194147.3.bam]
+```
+
+The output is now a set of *map* items. These are also known as dictionaries or
+associative arrays and allow for each element to be referred to by name where
+the name is the column heading. This will be useful if we need to select just
+some of the columns or change their order.
+
+We're going to use the `map` operator and a *closure*. A closure is a block of
+code that can be passed as an argument to a function. You can read more about
+features of the Groovy language such as variables, lists, maps and closures in
+the *Nextflow scripting* section of the Nextflow documentation.
+
+```
+// test.nf
+sample_sheet = Channel.fromPath("sample_sheet.csv")
+
+sample_sheet
+    .splitCsv(header:true)
+    .map { row -> tuple(row.id, row.bam) }
+    .view()
+```
+
+```
+nextflow run test.nf
+
+N E X T F L O W  ~  version 20.10.0
+Launching `test.nf` [kickass_gilbert] - revision: b62b3cd0eb
+[ERR194147_1, bam/ERR194147.1.bam]
+[ERR194147_2, bam/ERR194147.2.bam]
+[ERR194147_3, bam/ERR194147.3.bam]
+```
+
+One last thing we should do is to create a file object for each of the BAM files
+and at the same time check that they exist.
+
+```
+// test.nf
+sample_sheet = Channel.fromPath("sample_sheet.csv")
+
+sample_sheet
+    .splitCsv(header:true)
+    .map { row -> tuple(row.id, file(row.bam, checkIfExists: true)) }
+    .view()
+```
+
+```
+nextflow run test.nf
+
+N E X T F L O W  ~  version 20.10.0
+Launching `test.nf` [nostalgic_brown] - revision: 10e7649575
+[ERR194147_1, /Users/eldrid01/training/nextflow/nextflow_september_2021/junction_detection/bam/ERR194147.1.bam]
+[ERR194147_2, /Users/eldrid01/training/nextflow/nextflow_september_2021/junction_detection/bam/ERR194147.2.bam]
+[ERR194147_3, /Users/eldrid01/training/nextflow/nextflow_september_2021/junction_detection/bam/ERR194147.3.bam]
+```
+
+We're now ready to update our main workflow to read BAM files it works on from
+a sample sheet. Here is the updated version.
+
+```
+// junction_detection.nf
+
+nextflow.enable.dsl=2
+
+process extract_soft_clipped_reads {
+
+    input:
+        tuple val(id), path(bam)
+
+    output:
+        tuple val(id), path(fastq)
+
+    script:
+        fastq = "${id}.fq.gz"
+        """
+        samtools view -h -F2048 ${bam} \
+          | awk '\$0 ~ /^@/ || \$6 ~ /S/' \
+          | samtools fastq -N -o ${fastq}
+        """
+}
+
+process find_junction_spanning_reads {
+
+    input:
+        tuple val(id), path(fastq), path(flanking_sequences)
+
+    output:
+        path matches
+
+    script:
+        matches = "${id}.tsv"
+        """
+        find_junction_spanning_sequences.R \
+          --id=${id} \
+          --fastq=${fastq} \
+          --flanking-sequences=${flanking_sequences} \
+          --output=${matches} \
+          --max-distance=${params.max_distance}
+        """
+}
+
+workflow {
+
+    sample_sheet = Channel.fromPath(params.sample_sheet, checkIfExists: true)
+
+    bam = sample_sheet
+        .splitCsv(header:true)
+        .map { row -> tuple(row.id, file(row.bam, checkIfExists: true)) }
+
+    flanking_sequences = Channel.fromPath(params.flanking_sequences, checkIfExists: true)
+
+    bam \
+      | extract_soft_clipped_reads \
+      | splitFastq(by: params.chunk_size, file: true, compress: true) \
+      | combine(flanking_sequences) \
+      | find_junction_spanning_reads \
+      | collectFile(keepHeader: true, storeDir: params.results_dir)
+}
+```
+
+Note that the ID for each dataset (BAM file) is provided to the processes as
+part of a tuple input. The sample sheet is a configurable parameter that
+replaces the `bam_files` parameter we used previously.
+
+```
+// junction_detection.config
+
+params {
+    sample_sheet       = "sample_sheet.csv"
+    flanking_sequences = "resources/flanking_sequences.csv"
+    results_dir        = "results"
+    max_distance       = 1
+    chunk_size         = 10000
+}
+```
+
+Using a sample sheet gives us greater flexibility. In the real-life project in
+which this workflow was originally developed, the sequencing was spread across
+multiple flow cells and there were multiple input BAM files for each sample or
+dataset as there was a separate BAM file for each lane on which that sample was
+sequenced. The processing was run for each BAM file separately but the same ID
+could be used for more than one BAM file in the workflow so the results could be
+gathered for each sample very straightforwardly.
+
+> _**Exercise**_
+>
+> * Modify the sample sheet so that all three BAM files come from the same sample, i.e. share the same ID, re-run and check that the pipeline does what you expect it to
+>
+> * Repeat with two BAM files mapped to one sample and the third coming from a different sample
 
 ## Managing resources and profiles
 
