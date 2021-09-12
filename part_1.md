@@ -82,7 +82,7 @@ The `nextflow` file should be moved to a directory on your `PATH` so that you
 can run Nextflow without having to specify the absolute or relative path to this
 file.
 
-## Background for the example workflow - cancer genome rearrangement and junction-spanning read identification
+## Example workflow - cancer genome rearrangement and junction-spanning read identification
 
 The Rosenfeld lab are interested in monitoring the progression of cancers and
 recurrence oc cancer following treatment by analysing the circulating DNA within
@@ -1603,11 +1603,11 @@ directives. Here is an example of a submission script that we've named
 #SBATCH --output=junction_detection.%j.out
 
 nextflow run \
-	junction_detection_pipeline/junction_detection.nf \
-	-config junction_detection.config \
-	-profile cluster \
-	-with-report reports/report.html \
-	-with-timeline reports/timeline.html
+  junction_detection_pipeline/junction_detection.nf \
+  -config junction_detection.config \
+  -profile cluster \
+  -with-report reports/report.html \
+  -with-timeline reports/timeline.html
 ```
 
 This can be submitted to the cluster using `sbatch`.
