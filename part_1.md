@@ -1258,7 +1258,11 @@ argument to `collectFile`.
 
 workflow {
 
-    bam = Channel.fromPath(params.bam_files, checkIfExists: true)
+    sample_sheet = Channel.fromPath(params.sample_sheet, checkIfExists: true)
+
+    bam = sample_sheet
+        .splitCsv(header:true)
+        .map { row -> tuple(row.id, file(row.bam, checkIfExists: true)) }
 
     flanking_sequences = Channel.fromPath(params.flanking_sequences, checkIfExists: true)
 
@@ -1548,4 +1552,99 @@ params {
 
 ## Running on a cluster
 
-TODO
+The local executor is useful for developing pipelines but in many situations
+we will need to run a pipeline on an HPC or cloud platform. Nextflow has
+built-in support for several popular platforms with executors available for
+Slurm, LSF and Open Grid Engine clusters among others. It can also run jobs on
+the AWS, Azure and Google cloud platforms.
+
+We will add another profile for a cluster that uses the Slurm resource manager
+for scheduling jobs.
+
+```
+// nextflow.config
+
+...
+
+profiles {
+
+    ...
+
+    cluster {
+        process.executor = "slurm"
+        executor {
+            queueSize = 100
+            pollInterval = "30 sec"
+        }
+    }
+}
+```
+
+The `queueSize` parameter limits the number of tasks that the exectuor will
+handle in parallel, i.e. how many jobs it will submit to the Slurm scheduler at
+any one time. The name of the queue to submit jobs to can also be configured.
+
+The `pollInterval` setting determines how often Nextflow will poll to check for
+the termination of the submitted/running processes.
+
+Details of all the configuration settings available can be found in the Nextflow
+documentation.
+
+The Nextflow process that runs the pipeline should also be submitted to the
+cluster. The following is a bash script for running the pipeline with
+
+We can submit our `nextflow run` command to the scheduler using a Slurm
+submission script in which Slurm parameters are specified using `SBATCH`
+directives. Here is an example of a submission script that we've named
+`junction_detection.sh`.
+
+```
+#!/bin/bash
+#SBATCH --job-name="junction_detection"
+#SBATCH --mem=2048
+#SBATCH --time=720
+#SBATCH --output=junction_detection.%j.out
+
+nextflow run \
+	junction_detection_pipeline/junction_detection.nf \
+	-config junction_detection.config \
+	-profile cluster \
+	-with-report reports/report.html \
+	-with-timeline reports/timeline.html
+```
+
+This can be submitted to the cluster using `sbatch`.
+
+```
+sbatch junction_detection.sh
+```
+
+We can override cluster configuration settings for a specific run of the
+pipeline. For example, we may wish to limit the maximum number of concurrent
+jobs or reduce the polling interval. The lag between a job finishing and a
+new job being submitted can be annoying with a long polling interval,
+particularly when testing a pipeline on a small test dataset for which the
+jobs a relatively short-lived and when the cluster is not very busy.
+
+```
+// junction_detection.config
+
+params {
+    sample_sheet       = "sample_sheet.csv"
+    flanking_sequences = "resources/flanking_sequences.csv"
+    results_dir        = "results"
+    max_distance       = 2
+    chunk_size         = 10000
+}
+
+profiles {
+    cluster {
+        process.executor = "slurm"
+        executor {
+            queueSize = 50
+            pollInterval = "5 sec"
+        }
+    }
+}
+```
+
