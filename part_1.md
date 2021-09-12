@@ -621,10 +621,8 @@ workflow {
 
     flanking_sequences = Channel.fromPath(params.flanking_sequences, checkIfExists: true)
 
-    // assign output channel for soft-clipped FASTQ files
     fastq = extract_soft_clipped_reads(bam_channel)
 
-    // pass FASTQ files into new process
     // find_junction_spanning_reads(fastq, flanking_sequences)
 
     fastq.combine(flanking_sequences).view()
@@ -703,7 +701,6 @@ workflow {
 
     flanking_sequences = Channel.fromPath(params.flanking_sequences, checkIfExists: true)
 
-    // assign output channel for soft-clipped FASTQ files
     fastq = extract_soft_clipped_reads(bam_channel)
 
     fastq_and_flanking_sequences = fastq.combine(flanking_sequences)
