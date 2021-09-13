@@ -19,6 +19,9 @@ you to work with:
 * http://internal-bioinformatics.cruk.cam.ac.uk/training/nextflow/nextflow-alignment.tar.gz (the shell pipeline)
 * http://internal-bioinformatics.cruk.cam.ac.uk/training/nextflow/nftraining-alignment-data.zip (the data)
 
+You'll need to activate VPN outside the building to fetch
+these, but you won't need the VPN after that.
+
 Expand these archives into two different directories. You'll develop the
 pipeline in the first directory and run it from the data directory.
 
