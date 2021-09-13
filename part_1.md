@@ -1361,7 +1361,7 @@ this runs processes on the computer where Nextflow is launched.
 >
 > * Re-run the pipeline with the additional *executor* configuration given above and look at the timeline report
 >
-> * What change do you see in the way in which Nextflow has run the jobs?
+> * What change do you see in the way that Nextflow has run the jobs?
 
 Another aspect of a process that we might want to manage is its memory
 requirement. Let's say we expect the `find_junction_spanning_reads` process to
@@ -1542,9 +1542,9 @@ profiles {
 }
 ```
 
-Our run directory configuration file is simplified as it will no longer need
-to have most settings. Instead it will override the settings specific for the
-current run.
+Our run directory configuration file is simplified as it will no longer need to
+contain most of the settings. Instead it will override the settings specific to
+the current run.
 
 ```
 // junction_detection.config
@@ -1590,16 +1590,13 @@ profiles {
 
 The `queueSize` parameter limits the number of tasks that the exectuor will
 handle in parallel, i.e. how many jobs it will submit to the Slurm scheduler at
-any one time. The name of the queue to submit jobs to can also be configured.
-
+any one time. The name of the queue to submit jobs to can also be configured,
+although we haven't done so in this case and so the default queue will be used.
 The `pollInterval` setting determines how often Nextflow will poll to check for
 the termination of the submitted/running processes.
 
 Details of all the configuration settings available can be found in the Nextflow
 documentation.
-
-The Nextflow process that runs the pipeline should also be submitted to the
-cluster. The following is a bash script for running the pipeline with
 
 We can submit our `nextflow run` command to the scheduler using a Slurm
 submission script in which Slurm parameters are specified using `SBATCH`
@@ -1630,9 +1627,9 @@ sbatch junction_detection.sh
 We can override cluster configuration settings for a specific run of the
 pipeline. For example, we may wish to limit the maximum number of concurrent
 jobs or reduce the polling interval. The lag between a job finishing and a
-new job being submitted can be annoying with a long polling interval,
+new job being submitted can be annoying when using a long polling interval,
 particularly when testing a pipeline on a small test dataset for which the
-jobs a relatively short-lived and when the cluster is not very busy.
+jobs are relatively short-lived and when the cluster is not very busy.
 
 ```
 // junction_detection.config
