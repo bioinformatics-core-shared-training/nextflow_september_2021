@@ -219,9 +219,9 @@ script named `junction_detection.nf`.
 
 nextflow.enable.dsl=2
 
-bam_file = Channel.fromPath("bam/ERR194147.1.bam")
+bam_channel = Channel.fromPath("bam/ERR194147.1.bam")
 
-bam_file.view()
+bam_channel.view()
 ```
 
 Nextflow scripts are written using a domain-specific language (DSL) that is an
@@ -267,8 +267,8 @@ We will revert to using a single BAM file and add an additional argument to the
 
 nextflow.enable.dsl=2
 
-bam_file = Channel.fromPath("bam/ERR194147.1.bam", checkIfExists: true)
-bam_file.view()
+bam_channel = Channel.fromPath("bam/ERR194147.1.bam", checkIfExists: true)
+bam_channel.view()
 ```
 
 > _**Exercise**_
@@ -327,9 +327,9 @@ process extract_soft_clipped_reads {
 
 workflow {
 
-    bam_file = Channel.fromPath("bam/ERR194147.1.bam", checkIfExists: true)
+    bam_channel = Channel.fromPath("bam/ERR194147.1.bam", checkIfExists: true)
 
-    extract_soft_clipped_reads(bam_file)
+    extract_soft_clipped_reads(bam_channel)
 }
 ```
 
@@ -427,9 +427,9 @@ workflow {
 Note that the output path declaration uses the new `fastq` variable in place of
 the hard-coded file name.
 
-We also renamed the `bam_file` channel to `bam`, mainly for aesthetic reasons.
-Using the name `bam_file` has shown that the name of a channel does not have to
-match the name of an input in the process that uses it.
+We also renamed the `bam_channel` channel to `bam`, mainly for aesthetic
+reasons. Note that the name of a channel does not have to match the name of an
+input in the process that uses it.
 
 ## Configuration parameters
 
