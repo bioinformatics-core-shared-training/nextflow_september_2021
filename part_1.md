@@ -1174,6 +1174,8 @@ gathered for each sample very straightforwardly.
 > _**Exercise**_
 >
 > * Modify the sample sheet so that all three BAM files come from the same sample, i.e. share the same ID, re-run and check that the pipeline does what you expect it to
+>
+> * Add a `view` operation between the `extract_soft_clipped_reads` process and the `combine` operation, re-run the pipeline and see what Nextflow prints to the console
 
 ## Built-in splitting and parallelization
 
