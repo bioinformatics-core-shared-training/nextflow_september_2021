@@ -775,8 +775,7 @@ process find_junction_spanning_reads {
           --id=${prefix} \
           --fastq=${fastq} \
           --flanking-sequences=${flanking_sequences} \
-          --output=${matches} \
-          --max-distance=${params.max_distance}
+          --output=${matches}
         """
 }
 
