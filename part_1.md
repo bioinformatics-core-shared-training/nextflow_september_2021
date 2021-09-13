@@ -1016,7 +1016,7 @@ of parameters we can supply to `splitCsv` including the `header` parameter.
 sample_sheet = Channel.fromPath("sample_sheet.csv")
 
 sample_sheet
-    .splitCsv(header:true)
+    .splitCsv(header: true)
     .view()
 ```
 
@@ -1045,7 +1045,7 @@ the *Nextflow scripting* section of the Nextflow documentation.
 sample_sheet = Channel.fromPath("sample_sheet.csv")
 
 sample_sheet
-    .splitCsv(header:true)
+    .splitCsv(header: true)
     .map { row -> tuple(row.id, row.bam) }
     .view()
 ```
@@ -1068,7 +1068,7 @@ and, at the same time, check that they exist.
 sample_sheet = Channel.fromPath("sample_sheet.csv")
 
 sample_sheet
-    .splitCsv(header:true)
+    .splitCsv(header: true)
     .map { row -> tuple(row.id, file(row.bam, checkIfExists: true)) }
     .view()
 ```
@@ -1135,7 +1135,7 @@ workflow {
     sample_sheet = Channel.fromPath(params.sample_sheet, checkIfExists: true)
 
     bam = sample_sheet
-        .splitCsv(header:true)
+        .splitCsv(header: true)
         .map { row -> tuple(row.id, file(row.bam, checkIfExists: true)) }
 
     flanking_sequences = Channel.fromPath(params.flanking_sequences, checkIfExists: true)
@@ -1204,7 +1204,7 @@ workflow {
     sample_sheet = Channel.fromPath(params.sample_sheet, checkIfExists: true)
 
     bam = sample_sheet
-        .splitCsv(header:true)
+        .splitCsv(header: true)
         .map { row -> tuple(row.id, file(row.bam, checkIfExists: true)) }
 
     flanking_sequences = Channel.fromPath(params.flanking_sequences, checkIfExists: true)
@@ -1270,7 +1270,7 @@ workflow {
     sample_sheet = Channel.fromPath(params.sample_sheet, checkIfExists: true)
 
     bam = sample_sheet
-        .splitCsv(header:true)
+        .splitCsv(header: true)
         .map { row -> tuple(row.id, file(row.bam, checkIfExists: true)) }
 
     flanking_sequences = Channel.fromPath(params.flanking_sequences, checkIfExists: true)
