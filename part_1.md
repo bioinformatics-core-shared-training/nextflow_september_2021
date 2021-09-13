@@ -362,7 +362,7 @@ treating them as variables as it did for `${bam}`.
 > * Clean out the work directories, log files and cache
 >
 > ```
-> rm -rf work .nextflow*
+> rm -rf work .nextflow .nextflow.log*
 > ```
 >
 > * Change the file path for the BAM channel to run over all BAM files in the `bam` directory
@@ -490,7 +490,7 @@ Use the `-config` option when running Nextflow to specify the configuration
 file.
 
 ```
-nextflow run -config junction_detection.config junction_detection_pipeline/junction_detection.nf
+nextflow run junction_detection_pipeline/junction_detection.nf -config junction_detection.config
 ```
 
 ## Process for step 2
@@ -640,7 +640,7 @@ workflow {
 Re-running the workflow should result in something like the following output:
 
 ```
-nextflow run -config junction_detection.config junction_detection_pipeline/junction_detection.nf
+nextflow run junction_detection_pipeline/junction_detection.nf -config junction_detection.config
 
 N E X T F L O W  ~  version 20.10.0
 Launching `junction_detection_pipeline/junction_detection.nf` [modest_fourier] - revision: ee26729252
@@ -889,7 +889,7 @@ from the first, unchanged process are used as there is no need to re-run that
 step.
 
 ```
-nextflow run -config junction_detection.config -resume junction_detection_pipeline/junction_detection.nf
+nextflow run junction_detection_pipeline/junction_detection.nf -config junction_detection.config -resume
 
 N E X T F L O W  ~  version 20.10.0
 Launching `junction_detection_pipeline/junction_detection.nf` [small_hawking] - revision: 74847a471f
@@ -901,6 +901,8 @@ executor >  local (3)
 > _**Exercise**_
 >
 > * Explore the hidden `.nextflow` directory and the history file and cache directories contained within this
+>
+> * Run `nextflow log` to show the history of runs in the current directory (essentially the same as the `.nextflow/history` file but with column headings)
 
 ## Pipeline reports
 
