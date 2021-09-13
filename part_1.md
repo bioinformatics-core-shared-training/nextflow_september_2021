@@ -836,8 +836,8 @@ params {
 
 Nextflow keeps track of all the processes executed by a pipeline. If a part of
 the pipeline is modified, only the processes that have been changed and any
-afftected downstream processes will be re-executed if the pipeline is run with
-the `-resume` option.
+afftected downstream processes will be re-executed if the pipeline is re-run
+with the `-resume` option.
 
 The execution of the processes that are unaffected will be skipped and the
 cached results used instead.
@@ -918,22 +918,20 @@ nextflow run \
   -with-timeline reports/timeline.html
 ```
 
-*Note*
-
-Nextflow is unable to obtain runtime metrics on Mac OS unless the processes are
-run using a Docker or Singularity container (using containers is beyond the
-scope of this session). This means that the execution report will not contain
-some of the more useful information about resource usage.
+*Note - Nextflow is unable to obtain runtime metrics on Mac OS unless the
+processes are run using a Docker or Singularity container (using containers is
+beyond the scope of this session). This means that the execution report will not
+contain some of the more useful information about resource usage.*
 
 > _**Exercise**_
 >
-> * Take a look at the HTML reports and what details these provide
+> * Take a look at the HTML reports and what information these provide
 >
 > * Create an error in the R script that results in a failure, re-run the pipeline and see how this is reported both in the log file and the execution report
 >
 > * Fix the error, re-run the pipeline using `-resume` and check how the use of cached results from the first process is reported in the HTML reports
 >
-> * If you're using a Mac, try re-running the pipeline on a Linux server to see the more complete execution report
+> * If you're using a Mac, try re-running the pipeline on a Linux computer to see the more complete execution report
 
 ## Using a sample sheet
 
@@ -945,12 +943,13 @@ from flow cell, pool and barcode IDs instead.
 
 Using a sample sheet that maps BAM files to sample names or identifiers is an
 alternative and arguably better solution and Nextflow has a built-in function
-for reading the rows from a CSV file into a channel.
+for reading the rows from a CSV file into a channel that can be used for this
+purpose.
 
 Instead of taking the prefix of the BAM file we'll use an ID from a CSV file
 that contains two columns: `id` and `bam`.
 
-Create a sample sheet CSV file named `sample_sheet.csv` with the following
+We'll create a sample sheet CSV file named `sample_sheet.csv` with the following
 contents:
 
 ```
@@ -1189,8 +1188,10 @@ smaller jobs in parallel, potentially distributing the processing workload over
 many more CPUs (especially on a cluster) and reducing the time to wait for the
 results.
 
-A single additional step in our workflow is all that's needed as well as a new
-configuration parameter for the chunk size.
+A single additional step in our workflow, the `splitFastq` operation` between
+the `extract_soft_clipped_reads` process and `combine(flanking_sequences)`, is
+all that's needed. We also introduce a new configuration parameter for the chunk
+size.
 
 ```
 // junction_detection.nf
@@ -1228,7 +1229,7 @@ params {
 }
 ```
 
-Re-running the pipeline shows that we've split the three
+Re-running the pipeline shows that we've split what used to be 3
 `find_junction_spanning_reads` processes into 10 jobs.
 
 ```
@@ -1251,9 +1252,9 @@ executor >  local (13)
 
 Having split our `find_junction_spanning_reads` task into chunks we might want
 combine the outputs for each of the datasets separately rather than
-concatenating all the outputs as our current `collectFile` operation does. If
-we don't specify a file when calling `collectFile`, outputs with the same name
-are grouped together.
+concatenating all the outputs into a single file as our current `collectFile`
+operation does. If we don't specify a file when calling `collectFile`, outputs
+with the same name are grouped together.
 
 We'll reinstate the `results_dir` parameter and use this to set the `storeDir`
 argument to `collectFile`.
@@ -1296,7 +1297,7 @@ params {
 
 > _**Exercise**_
 >
-> * Update the pipeline with the change to the `collectFile` operation, re-run and look at difference in the results files that are created in the `results` directory
+> * Update the workflow with the change to the `collectFile` operation, re-run the pipeline and look at difference in the results files that are created in the `results` directory
 
 ## Managing resources
 
@@ -1360,7 +1361,7 @@ this runs processes on the computer where Nextflow is launched.
 >
 > * Re-run the pipeline with the additional *executor* configuration given above and look at the timeline report
 >
-> * What change do you see in the way in the way in which Nextflow has run the jobs?
+> * What change do you see in the way in which Nextflow has run the jobs?
 
 Another aspect of a process that we might want to manage is its memory
 requirement. Let's say we expect the `find_junction_spanning_reads` process to
