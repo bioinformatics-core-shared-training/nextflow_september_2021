@@ -219,9 +219,9 @@ script named `junction_detection.nf`.
 
 nextflow.enable.dsl=2
 
-bam_channel = Channel.fromPath("bam/ERR194147.1.bam")
+bam_file = Channel.fromPath("bam/ERR194147.1.bam")
 
-bam_channel.view()
+bam_file.view()
 ```
 
 Nextflow scripts are written using a domain-specific language (DSL) that is an
@@ -267,8 +267,8 @@ We will revert to using a single BAM file and add an additional argument to the
 
 nextflow.enable.dsl=2
 
-bam_channel = Channel.fromPath("bam/ERR194147.1.bam", checkIfExists: true)
-bam_channel.view()
+bam_file = Channel.fromPath("bam/ERR194147.1.bam", checkIfExists: true)
+bam_file.view()
 ```
 
 > _**Exercise**_
@@ -291,8 +291,8 @@ mkdir junction_detection_pipeline
 mv junction_detection.nf junction_detection_pipeline
 ```
 
-Re-run the pipeline specifying the path to the `junction_detection.nf` file
-(relative or absolute) to check it still works.
+Re-running the pipeline will now involve specifying the relative or absolute
+path to the `junction_detection.nf` file.
 
 ```
 nextflow run junction_detection_pipeline/junction_detection.nf
@@ -327,9 +327,9 @@ process extract_soft_clipped_reads {
 
 workflow {
 
-    bam_channel = Channel.fromPath("bam/ERR194147.1.bam", checkIfExists: true)
+    bam_file = Channel.fromPath("bam/ERR194147.1.bam", checkIfExists: true)
 
-    extract_soft_clipped_reads(bam_channel)
+    extract_soft_clipped_reads(bam_file)
 }
 ```
 
@@ -368,15 +368,15 @@ using `${bam}`.
 >
 > * Change the file path for the BAM channel to run over all BAM files in the `bam` directory
 >
-> * What do expect will happen when re-running the workflow?
+> * What do you expect will happen when re-running the workflow?
 >
 > * Re-run and check if you're correct
 
 ## Obtaining unique IDs from file names
 
-Our workflow currently outputs FASTQ files named `softclipped.fq.gz` for each
-input BAM file, albeit in different work directories. We would normally prefer
-to have output files that are named based on some identifier for the input
+Our workflow currently outputs FASTQ files, all named `softclipped.fq.gz`, for
+each input BAM file, albeit in different work directories. We would normally
+prefer to have output files that are named based on some identifier for the input
 dataset. One way of achieving this is to extract the ID from the input file
 name, for example using the base name that excludes the `.bam` suffix.
 
@@ -418,23 +418,27 @@ process extract_soft_clipped_reads {
 
 workflow {
 
-    bam_channel = Channel.fromPath("bam/ERR194147.*.bam", checkIfExists: true)
+    bam = Channel.fromPath("bam/ERR194147.*.bam", checkIfExists: true)
 
-    extract_soft_clipped_reads(bam_channel)
+    extract_soft_clipped_reads(bam)
 }
 ```
 
 Note that the output path declaration uses the new `fastq` variable in place of
 the hard-coded file name.
 
+We also renamed the `bam_file` channel to `bam`, mainly for aesthetic reasons.
+Using the name `bam_file` has shown that the name of a channel does not have to
+match the name of an input in the process that uses it.
+
 ## Configuration parameters
 
 Using hard-coded file paths, such as the case for our input BAM files, is not
 ideal. Each time we want to run the pipeline on a new set of input BAM files,
-we'd need to change the workflow file. Instead this should be a parameter that
+we'll need to change the workflow file. Instead this should be a parameter that
 can be configured for each run.
 
-Change the BAM channel so it uses a parameter named `bam_files` as follows.
+We'll change the BAM channel so it uses a parameter named `bam_files`.
 
 ```
 // junction_detection.nf
@@ -443,9 +447,9 @@ Change the BAM channel so it uses a parameter named `bam_files` as follows.
 
 workflow {
 
-    bam_channel = Channel.fromPath(params.bam_files, checkIfExists: true)
+    bam = Channel.fromPath(params.bam_files, checkIfExists: true)
 
-    extract_soft_clipped_reads(bam_channel)
+    extract_soft_clipped_reads(bam)
 }
 ```
 
@@ -462,7 +466,7 @@ Missing `fromPath` parameter
 ```
 
 One way to specify parameters is to add these as arguments at the end of the
-`nextflow run` invocation.
+`nextflow run` command.
 
 ```
 nextflow run junction_detection_pipeline/junction_detection.nf --bam_files="bam/*.bam"
@@ -472,8 +476,8 @@ Pipelines typically have several configuration parameters and specifying each on
 the command line can be cumbersome. It may be preferable to use a configuration
 file instead.
 
-Create a configuration file named `junction_detection.config` in your working
-directory containing the following `params` block.
+We'll create a configuration file named `junction_detection.config` in our
+working directory containing the following `params` block.
 
 ```
 // junction_detection.config
@@ -483,8 +487,8 @@ params {
 }
 ```
 
-Re-run the pipeline specifying the configuration file using the `-config`
-option.
+Use the `-config` option when running Nextflow to specify the configuration
+file.
 
 ```
 nextflow run -config junction_detection.config junction_detection_pipeline/junction_detection.nf
@@ -492,8 +496,8 @@ nextflow run -config junction_detection.config junction_detection_pipeline/junct
 
 ## Process for step 2
 
-We'll now add the process definition for the second step in the workflow that
-runs the R script for finding junction-spanning reads.
+We'll now add the process definition for the second step in the workflow; this
+is the step that runs the R script for finding junction-spanning reads.
 
 The new version of our workflow also creates a channel for the flanking
 sequences CSV file and joins the output from the first process to the input
@@ -547,19 +551,24 @@ process find_junction_spanning_reads {
 
 workflow {
 
-    bam_channel = Channel.fromPath(params.bam_files, checkIfExists: true)
+    bam = Channel.fromPath(params.bam_files, checkIfExists: true)
 
     flanking_sequences = Channel.fromPath(params.flanking_sequences, checkIfExists: true)
 
     // assign output channel for soft-clipped FASTQ files
-    fastq = extract_soft_clipped_reads(bam_channel)
+    fastq = extract_soft_clipped_reads(bam)
 
     // pass FASTQ files into new process
     find_junction_spanning_reads(fastq, flanking_sequences)
 }
 ```
 
-The new flanking_sequences parameter must be added to the configuration file.
+Note the use of the `getBaseName()` function to obtain the FASTQ file prefix in
+this second process, this time with the argument `2` to strip a two-part suffix.
+
+The new flanking_sequences parameter needs to be added to the configuration
+file.
+
 ```
 // junction_detection.config
 
@@ -570,11 +579,12 @@ params {
 ```
 
 The `find_junction_spanning_sequences.R` must be available on the PATH for the
-script block to run. Nextflow automatically adds a `bin` directory if it exists
-in the pipeline installation directory alongside the main Nextflow workflow
-`.nf` file.
+script block to run successfully. Nextflow automatically adds a `bin` directory
+to the PATH; this `bin` directory is located as a subdirectory of the
+installation directory in which the main Nextflow workflow file
+(`junction_detection.nf`) resides.
 
-Create the bin directory and copy the R script to it.
+We'll create the bin directory and copy the R script to it.
 
 ```
 mkdir junction_detection_pipeline/bin
@@ -599,7 +609,7 @@ sequences files to pair with.
 This might seem counterintuitive. Understanding how channels work as queues and
 how processes consume the items in each channel is fundamental to being able to
 write Nextflow pipelines. The section on Operators in the Nextflow documentation
-is well worth reading and contains lots of mini examples that illustrate the
+is well worth reading and contains lots of small examples that illustrate the
 many ways in which it is possible to work with and manipulate channels.
 
 The `combine` operator is what we need in this case. It combines the items
@@ -616,11 +626,11 @@ and view the result.
 
 workflow {
 
-    bam_channel = Channel.fromPath(params.bam_files, checkIfExists: true)
+    bam = Channel.fromPath(params.bam_files, checkIfExists: true)
 
     flanking_sequences = Channel.fromPath(params.flanking_sequences, checkIfExists: true)
 
-    fastq = extract_soft_clipped_reads(bam_channel)
+    fastq = extract_soft_clipped_reads(bam)
 
     // find_junction_spanning_reads(fastq, flanking_sequences)
 
@@ -642,9 +652,10 @@ executor >  local (3)
 [/Users/eldrid01/training/nextflow/junction_detection/work/82/ff7d7f8b74786c288cd57b4db368fc/ERR194147.1.fq.gz, /Users/eldrid01/training/nextflow/junction_detection/resources/flanking_sequences.csv]
 ```
 
-The channel resulting from this `combine` operation produces 2-element lists.
-The first element in each list is a FASTQ file from the `fastq` channel and the
-second element is the `flanking_sequences.csv` file.
+The channel resulting from this `combine` operation produces a series of lists,
+each comprised of 2 elements. The first element in each list is a FASTQ file
+from the `fastq` channel and the second element is the `flanking_sequences.csv`
+file.
 
 We can now pass each of these pairs into the second process but for that we need
 the input to be a 2-element tuple. The updated workflow is shown below.
@@ -696,11 +707,11 @@ process find_junction_spanning_reads {
 
 workflow {
 
-    bam_channel = Channel.fromPath(params.bam_files, checkIfExists: true)
+    bam = Channel.fromPath(params.bam_files, checkIfExists: true)
 
     flanking_sequences = Channel.fromPath(params.flanking_sequences, checkIfExists: true)
 
-    fastq = extract_soft_clipped_reads(bam_channel)
+    fastq = extract_soft_clipped_reads(bam)
 
     fastq_and_flanking_sequences = fastq.combine(flanking_sequences)
 
@@ -715,7 +726,7 @@ workflow {
 ## Using pipes
 
 Pipes can help to simplify the workflow and make it more readable. The following
-workflow block is equivalent to what we have above in which each channel is
+workflow block is equivalent to what we have currently in which each channel is
 assigned to a variable. Pipes remove the need for those intermediate variables.
 
 ```
@@ -1209,7 +1220,7 @@ workflow {
 // junction_detection.config
 
 params {
-    bam_files          = "bam/ERR194147.*.bam"
+    sample_sheet       = "sample_sheet.csv"
     flanking_sequences = "resources/flanking_sequences.csv"
     results            = "results/flanking_sequence_matches.tsv"
     max_distance       = 2
@@ -1275,7 +1286,7 @@ workflow {
 // junction_detection.config
 
 params {
-    bam_files          = "bam/ERR194147.*.bam"
+    sample_sheet       = "sample_sheet.csv"
     flanking_sequences = "resources/flanking_sequences.csv"
     results_dir        = "results"
     max_distance       = 2
