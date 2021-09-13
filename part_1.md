@@ -318,7 +318,7 @@ process extract_soft_clipped_reads {
     script:
         """
         samtools view -h -F2048 ${bam} \
-          | awk '$0 ~ /^@/ || $6 ~ /S/' \
+          | awk '\$0 ~ /^@/ || \$6 ~ /S/' \
           | samtools fastq -N - \
           | gzip \
           > softclipped.fq.gz
@@ -342,16 +342,15 @@ characters. Using double quotes allows for variable substitution, in much the
 same way as is in bash scripts. Note the BAM input file path is substituted
 using `${bam}`.
 
+Note that the `$0` and `$6` references to fields in the `awk` command had to be
+escaped using a backslash; otherwise Nextflow tries to substitute these,
+treating them as variables as it did for `${bam}`.
+
 > _**Exercise**_
 >
-> * Run the above version of our workflow and look at the error that's reported
+> * Update your `junction_detection.nf` workflow file as above and re-run it
 >
-> * Can you work out why it fails and how to fix it?
-> > * *Hint: you will need to escape the dollar symbols that are not being used for Nextflow variables (use backslash)*
->
-> * Check the work directory after it has been run successfully
->
-> * Look at the directories and files that have been created and try to understand how Nextflow sets up and runs the process
+> * Check the work directory and look at the files that have been created in its subdirectories - try to understand how Nextflow sets up and runs the process
 > > * *Hint: look for hidden files*
 >
 > * Examine the hidden log file named `.nextflow.log`
