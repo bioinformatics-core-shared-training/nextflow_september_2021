@@ -1,5 +1,3 @@
-# Nextflow training session
-
 # Part 1 - Walk-through of a simple pipeline
 
 ## Introduction
@@ -75,7 +73,7 @@ using the `help` command, and running the _'hello world'_ example workflow.
 ```
 
 ```
-./nextflow run run hello
+./nextflow run hello
 ```
 
 The `nextflow` file should be moved to a directory on your `PATH` so that you
@@ -85,21 +83,20 @@ file.
 ## Example workflow - cancer genome rearrangement and junction-spanning read identification
 
 The Rosenfeld lab are interested in monitoring the progression of cancers and
-recurrence oc cancer following treatment by analysing the circulating DNA within
+their recurrence following treatment by analysing the circulating DNA within
 blood samples taken from patients. The aim is to detect the presence of
 mutations specific to the patient's disease that were previously identified with
-whole genome sequencing of the patient's primary tumour following the initial
-diagnosis.
+whole genome sequencing of the primary tumour following the initial diagnosis.
 
 Genome rearrangement is a common characteristic of many cancers and one approach
-the group have been exploring is to identify translocations from a structural
-variant analysis of the primary tumour whole genome sequencing data and then
-apply a targeted amplicon-based sequencing approach to identify DNA fragments
-within blood samples that span the rearrangement breakpoint. A breakpoint is the
-junction between two genomic regions following a rearrangement within the
-genome. This may be between two regions that are from different chromosomes or
-from two parts of the same chromosome that are not expected to be joined in this
-way given the reference genome and sequencing data taken a from a non-cancerous
+the Rosenfeld group have been exploring is to identify translocations from a
+structural variant analysis of the primary tumour whole genome sequencing data
+and then apply a targeted amplicon-based sequencing approach to identify DNA
+fragments within blood samples that span the rearrangement breakpoint. A
+breakpoint is the junction between two genomic regions following a rearrangement.
+This may be between two regions that are from different chromosomes or from two
+parts of the same chromosome that are not expected to be joined in this way
+given the reference genome and sequencing data taken a from a non-cancerous
 control sample from that patient.
 
 The Rosenfeld group have designed PCR primers for rearrangements that are
@@ -112,7 +109,7 @@ the disease.
 An R script was written to support this analysis. It searches sequence reads for
 20 bases either side of the junction using a fuzzy pattern matching algorithm
 that allows for mismatches. The details of this script are not especially
-important for this training session but it should be noted that the script was
+important for this walk-through but it should be noted that the script was
 designed to work on relatively small amounts of data generated from a targeted
 sequencing approach.
 
@@ -134,7 +131,7 @@ pattern matching.
 ### Junction detection script and test data
 
 The R script for detecting junction-spanning reads and some test sequence data
-files are available
+and flanking query sequences are available
 [here](https://content.cruk.cam.ac.uk/bioinformatics/CourseData/NextflowSeptember2021/junction_detection.tar).
 
 Download and unpack tarball.
@@ -155,8 +152,8 @@ cd junction_detection
 ### Step 1: Extract soft-clipped reads
 
 The first step in the process is to extract the sequence reads with soft-clipped
-alignments. We will simplify matters by applying a simple `awk` command to
-filter records from an input BAM file that have a CIGAR string containing an 'S'
+alignments. We will simplify matters by using a simple `awk` command to filter
+records from an input BAM file that have a CIGAR string containing an 'S'
 character, indicating that the alignment has been soft clipped. The filtering
 used in the production pipeline was more discerning, taking into account that
 the subsequent step in the workflow searches for 20-nucleotide flanking
@@ -200,8 +197,8 @@ junctions and there is only a single match for soft-clipped reads extracted from
 
 ## Nextflow processes and channels
 
-A Nextflow workflow is composed of a set of processes that are joined together
-through channels.
+A Nextflow workflow is composed of a set of processes that are connected by
+channels.
 
 **Processes** can be written in any scripting language that can be run within a
 bash shell, e.g. Python, Perl, Ruby, R or bash.
@@ -230,7 +227,7 @@ bam_channel.view()
 Nextflow scripts are written using a domain-specific language (DSL) that is an
 extension of the Groovy scripting language, which in turn is a superset of the
 Java programming language. The first line is a comment using the '//' notation
-that will be familiar if you've coded in Java.
+that will be familiar to Java programmers.
 
 Nextflow introduced a new version of the DSL in July 2020. Use of DSL2 is
 strongly recommended and needs to be declared as shown in the above script.
@@ -238,8 +235,8 @@ strongly recommended and needs to be declared as shown in the above script.
 We use the `Channel.fromPath()` function to create a channel for just a single
 BAM file at this stage.
 
-The contents of a channel can be displayed with the `view()` function, which is
-useful when developing or debugging a pipeline.
+The contents of a channel can be displayed with the `view()` function. `view()`
+is very useful when developing or debugging a pipeline.
 
 Run the script as follows:
 
@@ -262,7 +259,7 @@ work was done. For that we need to create a process.
 >
 > * Change the file pattern to use a wildcard, i.e. `bam/ERR194147.*.bam` and re-run.
 
-Revert to a single BAM file and add an additional argument to the
+We will revert to using a single BAM file and add an additional argument to the
 `Channel.fromPath()` function to check if the file exists.
 
 ```
@@ -277,6 +274,8 @@ bam_channel.view()
 > _**Exercise**_
 >
 > * Change the BAM file path to a non-existent file, re-run the script and check that Nextflow flags the error
+>
+> * Change the BAM file path to a wildcard-based pattern that doesn't correspond to any files and check how Nextflow handles that
 
 ## Separate workflow installation directory
 
@@ -292,8 +291,8 @@ mkdir junction_detection_pipeline
 mv junction_detection.nf junction_detection_pipeline
 ```
 
-Re-run the pipeline specifying the path to the `nf` file (relative or absolute)
-to check it still works.
+Re-run the pipeline specifying the path to the `junction_detection.nf` file
+(relative or absolute) to check it still works.
 
 ```
 nextflow run junction_detection_pipeline/junction_detection.nf
