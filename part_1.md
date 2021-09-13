@@ -915,7 +915,7 @@ Use the `-with-report` and `-with-timeline` options to generate these reports.
 nextflow run \
   junction_detection_pipeline/junction_detection.nf \
   -config junction_detection.config \
-  -with-report reports/report.html \
+  -with-report reports/execution_report.html \
   -with-timeline reports/timeline.html
 ```
 
@@ -1237,8 +1237,8 @@ Re-running the pipeline shows that we've split what used to be 3
 nextflow run \
   junction_detection_pipeline/junction_detection.nf \
   -config junction_detection.config \
-  -with-report report.html \
-  -with-timeline timeline.html
+  -with-report reports/execution_report.html \
+  -with-timeline reports/timeline.html
 
 N E X T F L O W  ~  version 20.10.0
 Launching `junction_detection_pipeline/junction_detection.nf` [romantic_dijkstra] - revision: 821845dd01
@@ -1615,7 +1615,7 @@ nextflow run \
   junction_detection_pipeline/junction_detection.nf \
   -config junction_detection.config \
   -profile cluster \
-  -with-report reports/report.html \
+  -with-report reports/execution_report.html \
   -with-timeline reports/timeline.html
 ```
 
