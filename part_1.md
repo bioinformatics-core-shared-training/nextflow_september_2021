@@ -607,9 +607,11 @@ sequences files to pair with.
 
 This might seem counterintuitive. Understanding how channels work as queues and
 how processes consume the items in each channel is fundamental to being able to
-write Nextflow pipelines. The section on Operators in the Nextflow documentation
-is well worth reading and contains lots of small examples that illustrate the
-many ways in which it is possible to work with and manipulate channels.
+write Nextflow pipelines. See the section entitled *'Understand how multiple
+input channels work'* in the Nextflow documentation for further explanation.
+Also, the section on Operators is well worth reading and contains lots of small
+examples that illustrate the many ways in which it is possible to work with and
+manipulate channels.
 
 The `combine` operator is what we need in this case. It combines the items
 emitted by two channels resulting in all pairwise combinations.
@@ -631,9 +633,9 @@ workflow {
 
     fastq = extract_soft_clipped_reads(bam)
 
-    // find_junction_spanning_reads(fastq, flanking_sequences)
-
     fastq.combine(flanking_sequences).view()
+
+    // find_junction_spanning_reads(fastq, flanking_sequences)
 }
 ```
 
