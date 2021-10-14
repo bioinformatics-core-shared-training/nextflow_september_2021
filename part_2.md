@@ -19,6 +19,9 @@ you to work with:
 * http://internal-bioinformatics.cruk.cam.ac.uk/training/nextflow/nextflow-alignment.tar.gz (the shell pipeline)
 * http://internal-bioinformatics.cruk.cam.ac.uk/training/nextflow/nftraining-alignment-data.zip (the data)
 
+You'll need to activate VPN outside the building to fetch
+these, but you won't need the VPN after that.
+
 Expand these archives into two different directories. You'll develop the
 pipeline in the first directory and run it from the data directory.
 
@@ -61,6 +64,18 @@ nextflow run <path to pipeline>/simple.nf
 ```
 
 Run this from the data directory (wherever you have expanded the data zip).
+
+One thing to note when using the templates. Declare the executable block in
+the process using the "_shell_" executor rather than "_script_". So this block
+will look like:
+
+```
+shell:
+	template "<path>"
+```
+
+Have a little read through the section
+https://www.nextflow.io/docs/latest/process.html#script
 
 ### Step 1: Alignment
 
